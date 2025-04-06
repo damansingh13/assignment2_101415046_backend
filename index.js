@@ -20,7 +20,9 @@ const allowedOrigins = [
         callback(new Error('CORS not allowed for this origin: ' + origin));
       }
     },
-    credentials: true
+    methods: ['GET', 'POST', 'OPTIONS'], // Ensure OPTIONS is allowed
+    allowedHeaders: ['Content-Type', 'Authorization'], // Ensure correct headers
+    credentials: true // If you're using cookies or authorization headers
   }));
   
 
@@ -35,3 +37,4 @@ app.all('/graphql', createHandler({ schema }));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.options('*', cors());
