@@ -5,36 +5,40 @@ const { createHandler } = require('graphql-http/lib/use/express');
 const schema = require('./graphql/schema');
 const cors = require('cors');
 const { graphqlHTTP } = require('express-graphql');
+
 const app = express();
 
 const allowedOrigins = [
-    'http://localhost:4200',
-    'http://comp-3133-assignment2-frontend-delta.vercel.app'
-  ];
-  
-  app.use(cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('CORS not allowed for this origin: ' + origin));
-      }
-    },
-    methods: ['GET', 'POST', 'OPTIONS'], // Ensure OPTIONS is allowed
-    allowedHeaders: ['Content-Type', 'Authorization'], // Ensure correct headers
-    credentials: true // If you're using cookies or authorization headers
-  }));
-  
+  'http://localhost:4200',
+  'https://comp-3133-assignment2-frontend-delta.vercel.app'
+];
 
+// CORS middleware
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed for this origin: ' + origin));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// Parse JSON
 app.use(express.json());
 
+// GraphQL handler
 app.use('/graphql', graphqlHTTP({
-   schema,
-   graphiql: true
- }));
+  schema,
+  graphiql: true
+}));
 
-app.all('/graphql', createHandler({ schema }));
+// Fallback for OPTIONS requests (preflight)
+app.options('*', cors());
 
+// Server startup
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-app.options('*', cors());
