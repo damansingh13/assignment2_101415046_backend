@@ -1,0 +1,37 @@
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('./config/db');
+const { createHandler } = require('graphql-http/lib/use/express');
+const schema = require('./graphql/schema');
+const cors = require('cors');
+const { graphqlHTTP } = require('express-graphql');
+const app = express();
+
+const allowedOrigins = [
+    'http://localhost:4200',
+    'frontend link'
+  ];
+  
+  app.use(cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS not allowed for this origin: ' + origin));
+      }
+    },
+    credentials: true
+  }));
+  
+
+app.use(express.json());
+
+app.use('/graphql', graphqlHTTP({
+   schema,
+   graphiql: true
+ }));
+
+app.all('/graphql', createHandler({ schema }));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
