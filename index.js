@@ -9,7 +9,7 @@ const app = express();
 
 const allowedOrigins = [
     'http://localhost:4200',
-    'frontend link'
+    'http://comp3133-assignment2-frontend-delta.vercel.app'
   ];
   
   app.use(cors({
